@@ -4,31 +4,29 @@ import MonthOfPayment from './MonthOfPayment'
 export default class OneBill extends Component {
     constructor(props){
         super(props);
-        this.state = {year: '2020', month: 'Квітень',priviuseValue: '',currentValue: '', costEach: '', sumCost: '', paid: false};
+        this.state = {year: '2020', month: 'Квітень',prev: '',curr: '', cost: '', sum: ''};
     }
-    handleMonthChange = (e) => {this.setState({month:e.target.value})};
-    handleYearChange = (e) => {this.setState({year:e.target.value})};
-    handlePriviuseValue = (e) => {this.setState({priviuseValue: +e.target.value}, this.handleSumCost)};
-    handleCurrentValue = (e) => {this.setState({currentValue: +e.target.value}, this.handleSumCost)};
-    handleCostEach = (e) => {this.setState({costEach: +e.target.value}, this.handleSumCost)};
+    handleMonthChange = (month) => {this.setState({month:month})};
+    handleYearChange = (year) => {this.setState({year:year})};
+    handlePriviuseValue = (e) => {this.setState({prev: +e.target.value}, this.handleSumCost)};
+    handleCurrentValue = (e) => {this.setState({curr: +e.target.value}, this.handleSumCost)};
+    handleCostEach = (e) => {this.setState({cost: +e.target.value}, this.handleSumCost)};
     handlePaid = (e) => {this.setState({paid: e.target.checked})};
-    handleSumCost = () => {if (!this.state.currentValue || !this.state.costEach) return;
-                           this.setState((prevState)=>( {sumCost: (prevState.currentValue - prevState.priviuseValue)* prevState.costEach}))};
+    handleSumCost = () => {if (!this.state.curr || !this.state.cost) return;
+                           this.setState((prevState)=>( {sum: (prevState.curr - prevState.prev)* prevState.cost}))};
 
     sendData = () => {fetch(`insert?data=${JSON.stringify({[this.props.bill.categoryName]: this.state})}`, {method: "POST"})};
 
 
     render() {
-        const {bill} = this.props;
-        this.months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень', 'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
-        this.years =[];
-        for(let i = 2015;i<2126;i++){this.years.push(i + '')};
+        const {bill,many} = this.props;
+
         return(
-            <div className = 'my-4 border border-secondary '>
-                <div>
-                    <span>Вибрати місяць оплати: </span><select value={this.state.month} onChange={this.handleMonthChange}>{this.months.map((month)=><option value={month} key = {month}>{month}</option>)}</select>
-                    <select value={this.state.year} onChange={this.handleYearChange}>{this.years.map((year)=><option value={year} key = {year}>{year}</option>)}</select>
-                </div>
+            <div className = 'my-4'>
+                {many ? '' : <MonthOfPayment year = {this.state.year}
+                                             month = {this.state.month}
+                                             onYearChange = {this.handleYearChange}
+                                             onMonthChange ={this.handleMonthChange}/>}
             <div className="border border-secondary my-2 p-4">
               <h1>{bill.title}</h1>
               <table className= 'card-text'>
@@ -39,7 +37,7 @@ export default class OneBill extends Component {
                         <tr className = 'valueInput'>
                             <td>Попередній показник:</td>
                             <td><input type='number'
-                                       value = {this.priviuseValue}
+                                       value = {this.prev}
                                        onChange = {this.handlePriviuseValue}
                                        className = 'all-inputs'/>
                             </td>
@@ -47,7 +45,7 @@ export default class OneBill extends Component {
                 <tr className = 'valueInput'>
                     <td>Поточний показник:</td>
                     <td><input type='number'
-                               value = {this.currentValue}
+                               value = {this.curr}
                                onChange = {this.handleCurrentValue}
                                className = 'all-inputs' />
                     </td>
@@ -56,14 +54,14 @@ export default class OneBill extends Component {
                 <tr className = 'costInput'>
                     <td>Тариф:</td>
                     <td><input type='number'
-                               value = {this.costEach}
+                               value = {this.cost}
                                onChange = {this.handleCostEach}
                                className = 'all-inputs' />
                     </td>
                 </tr>
                 <tr className = 'costInput'>
                     <td>Сума:</td>
-                    <td>{this.state.sumCost}</td>
+                    <td>{this.state.sum}</td>
                 </tr>
                 <tr>
                     <td>Оплачено</td>
@@ -76,7 +74,7 @@ export default class OneBill extends Component {
                 </tbody>
             </table>
           </div>
-          <input type = 'button' className = ' btn-primary ' value= 'Додати' onClick ={this.sendData}/>
+                {many ? '' : <input type = 'button' className = ' btn-primary ' value= 'Додати' onClick ={this.sendData}/>}
         </div>
         );
     }
