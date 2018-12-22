@@ -22,7 +22,7 @@ export default class OneBill extends Component {
         const {bill,many} = this.props;
 
         return(
-            <div className = 'my-4'>
+            <div className = 'my-2'>
                 {many ? '' : <MonthOfPayment year = {this.state.year}
                                              month = {this.state.month}
                                              onYearChange = {this.handleYearChange}
